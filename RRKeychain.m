@@ -109,9 +109,9 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
     // number of results
     CFIndex length = CFArrayGetCount(result);
 
-    if( length == 0 ) return [NSArray array];
+    if( length <= 0 ) return [NSArray array];
     
-    NSMutableArray *userNames = [NSMutableArray arrayWithCapacity:length];
+    NSMutableArray *userNames = [NSMutableArray arrayWithCapacity:(NSUInteger)length];
     
     // Enumerate
     CFStringRef account;
