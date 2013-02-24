@@ -28,6 +28,7 @@
 //
 
 #import "RRKeychain.h"
+#import <Security/Security.h>
 
 
 NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
@@ -56,25 +57,25 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
         case errSecSuccess:
             return nil;
         case errSecUnimplemented:
-            return [NSError errorWithDomain:RRKeychainErrorDomain code:status localizedDescription:@"Function or operation not implemented."];
+            return [NSError errorWithDomain:RRKeychainErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@"Function or operation not implemented."}];
         case errSecParam:
-            return [NSError errorWithDomain:RRKeychainErrorDomain code:status localizedDescription:@"One or more parameters passed to a function where not valid."];
+            return [NSError errorWithDomain:RRKeychainErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@"One or more parameters passed to a function where not valid."}];
         case errSecAllocate:
-            return [NSError errorWithDomain:RRKeychainErrorDomain code:status localizedDescription:@"Failed to allocate memory."];
+            return [NSError errorWithDomain:RRKeychainErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@"Failed to allocate memory."}];
         case errSecNotAvailable:
-            return [NSError errorWithDomain:RRKeychainErrorDomain code:status localizedDescription:@"No keychain is available. You may need to restart your computer."];
+            return [NSError errorWithDomain:RRKeychainErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@"No keychain is available. You may need to restart your computer."}];
         case errSecDuplicateItem:
-            return [NSError errorWithDomain:RRKeychainErrorDomain code:status localizedDescription:@"The specified item already exists in the keychain."];
+            return [NSError errorWithDomain:RRKeychainErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@"The specified item already exists in the keychain."}];
         case errSecItemNotFound:
-            return [NSError errorWithDomain:RRKeychainErrorDomain code:status localizedDescription:@"The specified item could not be found in the keychain."];
+            return [NSError errorWithDomain:RRKeychainErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@"The specified item could not be found in the keychain."}];
         case errSecInteractionNotAllowed:
-            return [NSError errorWithDomain:RRKeychainErrorDomain code:status localizedDescription:@"User interaction is not allowed."];
+            return [NSError errorWithDomain:RRKeychainErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@"User interaction is not allowed."}];
         case errSecDecode:
-            return [NSError errorWithDomain:RRKeychainErrorDomain code:status localizedDescription:@"Unable to decode the provided data."];
+            return [NSError errorWithDomain:RRKeychainErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@"Unable to decode the provided data."}];
         case errSecAuthFailed:
-            return [NSError errorWithDomain:RRKeychainErrorDomain code:status localizedDescription:@"The user name or passphrase you entered is not correct."];
+            return [NSError errorWithDomain:RRKeychainErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@"The user name or passphrase you entered is not correct."}];
         default:
-            return [NSError errorWithDomain:RRKeychainErrorDomain code:status localizedDescription:@"Unknown error"];
+            return [NSError errorWithDomain:RRKeychainErrorDomain code:status userInfo:@{NSLocalizedDescriptionKey:@"Unknown error"}];
     }
     
 }
