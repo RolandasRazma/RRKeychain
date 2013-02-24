@@ -39,9 +39,18 @@ NSString * const RRKeychainErrorDomain;
 @interface RRKeychain : NSObject
 
 + (RRKeychain *)sharedKeychain;
+
 - (NSArray *)accountsForService:(NSString *)service error:(NSError **)error;
-- (NSString *)passwordForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
+
 - (BOOL)setPassword:(NSString *)password forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
-- (BOOL)removePasswordForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
+- (NSString *)passwordForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
+
+- (BOOL)setPropertyList:(id)object forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
+- (id)propertyListForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
+
+- (BOOL)setData:(NSData *)data forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
+- (NSData *)dataForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
+
+- (BOOL)removeRecordForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
 
 @end

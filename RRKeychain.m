@@ -128,19 +128,125 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
 }
 
 
+- (BOOL)setPassword:(NSString *)password forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+    return [self setData:[password dataUsingEncoding: NSUTF8StringEncoding] forAccount:account andService:service error:error];
+}
+
+
 - (NSString *)passwordForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
     
     // nil error
     if( error != NULL ) *error = nil;
     
+    NSError *getDataError = nil;
+    NSData *data = [self dataForAccount:account andService:service error:&getDataError];
+    
+    if( getDataError ){
+        if( error != NULL ) *error = getDataError;
+        return nil;
+    }
+
+    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+}
+
+
+- (BOOL)setPropertyList:(id)object forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+
+    // nil error
+    if( error != NULL ) *error = nil;
+    
+    NSError *serializationError = nil;
+    NSData *data = [NSPropertyListSerialization dataWithPropertyList: object
+                                                              format: NSPropertyListBinaryFormat_v1_0
+                                                             options: 0
+                                                               error: &serializationError];
+
+    if( serializationError ){
+        if ( error != NULL ) *error = [NSError errorWithDomain:RRKeychainErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey:serializationError}];
+        return NO;
+    }
+
+    return [self setData:data forAccount:account andService:service error:error];
+}
+
+
+- (id)propertyListForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+
+    // nil error
+    if( error != NULL ) *error = nil;
+    
+    NSError *getDataError = nil;
+    NSData *data = [self dataForAccount:account andService:service error:&getDataError];
+    
+    if( getDataError ){
+        if( error != NULL ) *error = getDataError;
+        return nil;
+    }
+    
+    NSString *serializationError = nil;
+    id propertyList = [NSPropertyListSerialization propertyListFromData: data
+                                                       mutabilityOption: NSPropertyListImmutable
+                                                                 format: NULL
+                                                       errorDescription: &serializationError];
+
+    if( serializationError ){
+        if ( error != NULL ) *error = [NSError errorWithDomain:RRKeychainErrorDomain code:1 userInfo:@{NSLocalizedDescriptionKey:serializationError}];
+        return nil;
+    }
+
+    return propertyList;
+}
+
+
+- (BOOL)setData:(NSData *)data forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+    
+    // nil error
+    if( error != NULL ) *error = nil;
+
+    // remove old one if it exists - I guess update would be safer...
+    NSError *removeDataError = nil;
+    if( [self dataForAccount:account andService:service error:&removeDataError] ){
+        [self removeRecordForAccount:account andService:service error:&removeDataError];
+    }
+    
+    if( removeDataError ){
+        if( error != NULL ) *error = removeDataError;
+        return NO;
+    }
+
+    // create query
+    CFMutableDictionaryRef query = CFDictionaryCreateMutable(kCFAllocatorDefault, 4, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+    CFDictionaryAddValue(query, kSecClass,          kSecClassGenericPassword);
+    CFDictionaryAddValue(query, kSecValueData,      (__bridge const void *)data);
+    CFDictionaryAddValue(query, kSecAttrAccount,    (__bridge const void *)account);
+    CFDictionaryAddValue(query, kSecAttrService,    (__bridge const void *)service);
+    
+    OSStatus status = SecItemAdd(query, NULL);
+    CFRelease(query);
+    
+    // did we got error?
+    if( status != errSecSuccess ) {
+        if ( error != NULL ) *error = [self errorForOSStatus:status];
+        return NO;
+    }
+    
+    return YES;
+}
+
+
+- (NSData *)dataForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+    
+    // nil error
+    if( error != NULL ) *error = nil;
+
     // create query
     CFMutableDictionaryRef query = CFDictionaryCreateMutable(kCFAllocatorDefault, 5, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     CFDictionaryAddValue(query, kSecReturnData,     kCFBooleanTrue);
     CFDictionaryAddValue(query, kSecMatchLimit,     kSecMatchLimitOne);
     CFDictionaryAddValue(query, kSecClass,          kSecClassGenericPassword);
-    CFDictionaryAddValue(query, kSecAttrService,    (__bridge const void *)(service));
-    CFDictionaryAddValue(query, kSecAttrAccount,    (__bridge const void *)(account));
-
+    CFDictionaryAddValue(query, kSecAttrAccount,    (__bridge const void *)account);
+    CFDictionaryAddValue(query, kSecAttrService,    (__bridge const void *)service);
+    
     // perform query
     CFDataRef result = nil;
     OSStatus status = SecItemCopyMatching(query, (CFTypeRef *)&result);
@@ -150,60 +256,15 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
     if( status != errSecSuccess ) {
         if( status == errSecItemNotFound ) return nil;
         
-        if ( error != NULL ) {
-            *error = [self errorForOSStatus:status];
-        }
+        if ( error != NULL ) *error = [self errorForOSStatus:status];
         return nil;
     }
-    
-    NSString *password = [[NSString alloc] initWithData:(__bridge NSData *)result encoding:NSUTF8StringEncoding];
 
-    CFRelease(result);
-    
-    return password;
+    return (NSData *)CFBridgingRelease(result);
 }
 
 
-- (BOOL)setPassword:(NSString *)password forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
-    
-    // nil error
-    if( error != NULL ) *error = nil;
-    
-    // remove old one if it exists
-    NSError *setPasswordError = nil;
-    if( [self passwordForAccount:account andService:service error:&setPasswordError] ){
-        [self removePasswordForAccount:account andService:service error:&setPasswordError];
-    }
-    
-    if( setPasswordError ){
-        if( error != NULL ) *error = setPasswordError;
-        return NO;
-    }
-
-    // create query
-    CFMutableDictionaryRef query = CFDictionaryCreateMutable(kCFAllocatorDefault, 4, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-    CFDictionaryAddValue(query, kSecClass,          kSecClassGenericPassword);
-    CFDictionaryAddValue(query, kSecAttrService,    (__bridge const void *)(service));
-    CFDictionaryAddValue(query, kSecAttrAccount,    (__bridge const void *)(account));
-    CFDictionaryAddValue(query, kSecValueData,      (__bridge const void *)[password dataUsingEncoding: NSUTF8StringEncoding]);
-
-    OSStatus status = SecItemAdd(query, NULL);
-    CFRelease(query);
-    
-    // did we got error?
-    if( status != errSecSuccess ) {
-        if ( error != NULL ) {
-            *error = [self errorForOSStatus:status];
-        }
-        return NO;
-    }
-
-    return YES;
-
-}
-
-
-- (BOOL)removePasswordForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+- (BOOL)removeRecordForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
     
     // nil error
     if( error != NULL ) *error = nil;
