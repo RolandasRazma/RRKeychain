@@ -145,8 +145,8 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
         if( error != NULL ) *error = getDataError;
         return nil;
     }
-
-    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    
+    return (data?[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]:nil);
 }
 
 
