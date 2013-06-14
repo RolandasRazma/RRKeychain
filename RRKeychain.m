@@ -81,7 +81,7 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
 }
 
 
-- (NSArray *)accountsForService:(NSString *)service error:(NSError **)error {
+- (NSArray *)accountsForService:(NSString *)service error:(NSError * __autoreleasing *)error {
     
     // nil error
     if( error != NULL ) *error = nil;
@@ -128,12 +128,12 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
 }
 
 
-- (BOOL)setPassword:(NSString *)password forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+- (BOOL)setPassword:(NSString *)password forAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error {
     return [self setData:[password dataUsingEncoding: NSUTF8StringEncoding] forAccount:account andService:service error:error];
 }
 
 
-- (NSString *)passwordForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+- (NSString *)passwordForAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error {
     
     // nil error
     if( error != NULL ) *error = nil;
@@ -150,7 +150,7 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
 }
 
 
-- (BOOL)setPropertyList:(id)object forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+- (BOOL)setPropertyList:(id)object forAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error {
 
     // nil error
     if( error != NULL ) *error = nil;
@@ -170,7 +170,7 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
 }
 
 
-- (id)propertyListForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+- (id)propertyListForAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error {
 
     // nil error
     if( error != NULL ) *error = nil;
@@ -198,7 +198,7 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
 }
 
 
-- (BOOL)setData:(NSData *)data forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+- (BOOL)setData:(NSData *)data forAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error {
     
     // nil error
     if( error != NULL ) *error = nil;
@@ -234,7 +234,7 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
 }
 
 
-- (NSData *)dataForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+- (NSData *)dataForAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error {
     
     // nil error
     if( error != NULL ) *error = nil;
@@ -264,7 +264,7 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
 }
 
 
-- (BOOL)removeRecordForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error {
+- (BOOL)removeRecordForAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error {
     
     // nil error
     if( error != NULL ) *error = nil;

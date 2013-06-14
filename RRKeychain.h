@@ -42,15 +42,15 @@ NSString * const RRKeychainErrorDomain;
 
 - (NSArray *)accountsForService:(NSString *)service error:(NSError **)error;
 
-- (BOOL)setPassword:(NSString *)password forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
-- (NSString *)passwordForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
+- (BOOL)setPassword:(NSString *)password forAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error;
+- (NSString *)passwordForAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error;
 
-- (BOOL)setPropertyList:(id)object forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
-- (id)propertyListForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
+- (BOOL)setPropertyList:(id)object forAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error;
+- (id)propertyListForAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error;
 
-- (BOOL)setData:(NSData *)data forAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
-- (NSData *)dataForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
+- (BOOL)setData:(NSData *)data forAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error;
+- (NSData *)dataForAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error;
 
-- (BOOL)removeRecordForAccount:(NSString *)account andService:(NSString *)service error:(NSError **)error;
+- (BOOL)removeRecordForAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error;
 
 @end
