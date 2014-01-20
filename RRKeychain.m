@@ -129,7 +129,20 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
 
 
 - (BOOL)setPassword:(NSString *)password forAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error {
-    return [self setData:[password dataUsingEncoding: NSUTF8StringEncoding] forAccount:account andService:service error:error];
+    return [self setPassword: password
+                  forAccount: account
+                  andService: service
+                  accessible: kSecAttrAccessibleWhenUnlocked
+                       error: error];
+}
+
+
+- (BOOL)setPassword:(NSString *)password forAccount:(NSString *)account andService:(NSString *)service accessible:(CFTypeRef)accessible error:(NSError * __autoreleasing *)error {
+    return [self setData: [password dataUsingEncoding: NSUTF8StringEncoding]
+              forAccount: account
+              andService: service
+              accessible: accessible
+                   error: error];
 }
 
 
@@ -166,7 +179,11 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
         return NO;
     }
 
-    return [self setData:data forAccount:account andService:service error:error];
+    return [self setData: data
+              forAccount: account
+              andService: service
+              accessible: kSecAttrAccessibleWhenUnlocked
+                   error: error];
 }
 
 
@@ -198,7 +215,7 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
 }
 
 
-- (BOOL)setData:(NSData *)data forAccount:(NSString *)account andService:(NSString *)service error:(NSError * __autoreleasing *)error {
+- (BOOL)setData:(NSData *)data forAccount:(NSString *)account andService:(NSString *)service accessible:(CFTypeRef)accessible error:(NSError * __autoreleasing *)error {
     
     // nil error
     if( error != NULL ) *error = nil;
@@ -215,8 +232,9 @@ NSString * const RRKeychainErrorDomain = @"RRKeychainErrorDomain";
     }
 
     // create query
-    CFMutableDictionaryRef query = CFDictionaryCreateMutable(kCFAllocatorDefault, 4, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+    CFMutableDictionaryRef query = CFDictionaryCreateMutable(kCFAllocatorDefault, 5, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     CFDictionaryAddValue(query, kSecClass,          kSecClassGenericPassword);
+    CFDictionaryAddValue(query, kSecAttrAccessible, accessible);
     CFDictionaryAddValue(query, kSecValueData,      (__bridge const void *)data);
     CFDictionaryAddValue(query, kSecAttrAccount,    (__bridge const void *)account);
     CFDictionaryAddValue(query, kSecAttrService,    (__bridge const void *)service);
