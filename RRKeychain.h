@@ -33,7 +33,7 @@
 #import <Foundation/Foundation.h>
 
 
-NSString * const RRKeychainErrorDomain;
+extern NSString * const RRKeychainErrorDomain;
 
 
 @interface RRKeychain : NSObject
